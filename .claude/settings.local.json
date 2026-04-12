@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(timeout 60 bash -c \"while [ ! -f C:/Users/varun/AppData/Local/Temp/claude/A--yash-draft-plant-disease-pridiction/*/bp54gg6jf.output ]; do sleep 1; done; cat C:/Users/varun/AppData/Local/Temp/claude/A--yash-draft-plant-disease-pridiction/*/bp54gg6jf.output\")",
+      "Bash(dir C:\\\\Users\\\\varun\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\A--yash-draft-plant-disease-pridiction\\\\* /s /b)",
+      "Bash(findstr bp54gg6jf:*)",
+      "Bash(timeout 30 bash -c \"while [ ! -f /c/Users/varun/AppData/Local/Temp/claude/A--yash-draft-plant-disease-pridiction/*/b3x8nhdcx.output ]; do sleep 1; done; cat /c/Users/varun/AppData/Local/Temp/claude/A--yash-draft-plant-disease-pridiction/*/b3x8nhdcx.output\")"
+    ]
+  }
+}

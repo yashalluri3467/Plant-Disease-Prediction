@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+
+# Model Files
+*.h5
+*.keras
+*.pt
+
+# Dataset
+dataset/
+*.zip
+
+# Environment Variables
+.env
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# IDE Files
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db

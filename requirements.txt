@@ -1,0 +1,9 @@
+tensorflow
+numpy
+scipy
+streamlit
+pillow
+python-dotenv
+requests
+tqdm
+kagglehub
