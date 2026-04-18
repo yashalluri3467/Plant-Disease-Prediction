@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "frontend/dist",
+  "functions": {
+    "api/*.py": {
+      "runtime": "python3.11"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/predict",
+      "methods": ["GET", "POST", "OPTIONS"],
+      "dest": "/api/predict.py"
+    },
+    {
+      "src": "/api/ai_advice",
+      "methods": ["GET", "POST", "OPTIONS"],
+      "dest": "/api/ai_advice.py"
+    },
+    {
+      "src": "/api/health",
+      "methods": ["GET", "HEAD", "OPTIONS"],
+      "dest": "/api/health.py"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
