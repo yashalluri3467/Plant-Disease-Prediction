@@ -18,8 +18,14 @@ class AdvicePayload(BaseModel):
     crop_name: str | None = None
 
 
+@app.get("/")
+def ai_advice_usage():
+    return {
+        "message": "Use POST /api/ai_advice with JSON body: {\"disease_name\": \"...\", \"crop_name\": \"...\"}"
+    }
+
+
 @app.post("/")
-@app.post("/api/ai_advice")
 def ai_advice(payload: AdvicePayload):
     try:
         from src.openrouter_integration import get_disease_advice

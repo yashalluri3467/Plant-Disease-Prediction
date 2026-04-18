@@ -1,8 +1,7 @@
-from pydantic import BaseModel
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Plant Disease Prediction API")
+app = FastAPI(title="Plant Disease Predict API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -13,13 +12,14 @@ app.add_middleware(
 )
 
 
-class AdvicePayload(BaseModel):
-    disease_name: str
-    crop_name: str | None = None
+@app.get("/")
+def predict_usage():
+    return {
+        "message": "Use POST /api/predict with multipart form-data: file=<image>, use_ai_advice=true|false"
+    }
 
 
 @app.post("/")
-@app.post("/api/predict")
 async def predict(file: UploadFile = File(...), use_ai_advice: str = Form("false")):
     try:
         from src.inference_service import infer_from_bytes
@@ -31,12 +31,11 @@ async def predict(file: UploadFile = File(...), use_ai_advice: str = Form("false
         normalized_advice_flag = use_ai_advice.strip().lower()
         parsed_advice_flag = normalized_advice_flag in {"1", "true", "yes", "on"}
 
-        result = infer_from_bytes(
+        return infer_from_bytes(
             image_bytes=image_bytes,
             source_filename=file.filename or "uploaded_image.jpg",
             use_ai_advice=parsed_advice_flag,
         )
-        return result
     except HTTPException:
         raise
     except FileNotFoundError as exc:
@@ -47,14 +46,3 @@ async def predict(file: UploadFile = File(...), use_ai_advice: str = Form("false
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {exc}") from exc
-
-
-@app.post("/api/ai_advice")
-def ai_advice(payload: AdvicePayload):
-    try:
-        from src.openrouter_integration import get_disease_advice
-
-        ai_response = get_disease_advice(payload.disease_name, payload.crop_name)
-        return {"ai_advice": ai_response}
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Failed to fetch AI advice: {exc}") from exc
