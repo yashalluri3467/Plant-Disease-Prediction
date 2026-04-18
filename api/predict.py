@@ -2,9 +2,6 @@ from pydantic import BaseModel
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.inference_service import infer_from_bytes
-from src.openrouter_integration import get_disease_advice
-
 app = FastAPI(title="Plant Disease Prediction API")
 
 app.add_middleware(
@@ -25,6 +22,8 @@ class AdvicePayload(BaseModel):
 @app.post("/api/predict")
 async def predict(file: UploadFile = File(...), use_ai_advice: str = Form("false")):
     try:
+        from src.inference_service import infer_from_bytes
+
         image_bytes = await file.read()
         if not image_bytes:
             raise HTTPException(status_code=400, detail="Uploaded file is empty.")
@@ -53,6 +52,8 @@ async def predict(file: UploadFile = File(...), use_ai_advice: str = Form("false
 @app.post("/api/ai_advice")
 def ai_advice(payload: AdvicePayload):
     try:
+        from src.openrouter_integration import get_disease_advice
+
         ai_response = get_disease_advice(payload.disease_name, payload.crop_name)
         return {"ai_advice": ai_response}
     except Exception as exc:
