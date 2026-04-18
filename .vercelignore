@@ -1,0 +1,16 @@
+.git
+.venv
+.vs
+dataset
+models
+notebooks
+__pycache__
+*.ipynb
+*.h5
+*.keras
+*.pt
+*.log
+CIA submission Notice.pdf
+core file.md
+backup agent.md
+

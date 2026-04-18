@@ -1,113 +1,138 @@
-﻿# Plant Disease Prediction and Remedy Assistant
+# Plant Disease Prediction Web App (React + Python API)
 
-This project uses a CNN model to detect plant diseases from leaf images and now also provides remedy guidance (local knowledge base + optional AI advice through OpenRouter).
+This project is now a web-first app:
 
-## What is included
-
-- Disease detection using TensorFlow/Keras
-- Streamlit app for image upload and prediction
-- Local remedy suggestions (immediate actions + prevention)
-- Optional OpenRouter advice for richer treatment text
-- Dataset downloader script for Kaggle dataset
+- Frontend: React (Vite), HTML, CSS
+- Backend API: FastAPI (prediction + optional OpenRouter advice)
+- Deployment target: Vercel
 
 ## Project structure
 
 ```text
 plant disease pridiction/
-  dataset/
-    train/
-    valid/
+  api/
+    _inference.py
+    predict.py
+    ai_advice.py
+    health.py
+  frontend/
+    src/
+      App.jsx
+      api.js
+      main.jsx
+      styles.css
+    index.html
+    package.json
+    vite.config.js
   models/
     plant_disease_model.h5
     class_names.json
   src/
-    __init__.py
     class_utils.py
+    novel_class_handler.py
     openrouter_integration.py
     predict.py
     preprocess.py
     remedy_knowledge.py
     train.py
-  app.py
   config.py
-  download_dataset.py
   requirements.txt
-  .env
+  vercel.json
 ```
 
-## Setup
+## Local development
 
-1. Create virtual environment:
+### 1) Python setup
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\activate
-```
-
-2. Install dependencies:
-
-```powershell
 pip install -r requirements.txt
 ```
 
-3. Configure OpenRouter (optional, for AI advice):
+### 2) Frontend setup
 
-Edit `.env`:
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend starts on `http://localhost:5173`.
+
+### 3) Run API locally
+
+In another terminal:
+
+```powershell
+.\.venv\Scripts\activate
+uvicorn api.predict:app --reload --port 8001
+```
+
+Optional AI advice endpoint:
+
+```powershell
+uvicorn api.ai_advice:app --reload --port 8002
+```
+
+Set frontend API base URL:
+
+```powershell
+$env:VITE_API_BASE_URL='http://localhost:8001'
+```
+
+For AI advice via separate port, you can proxy or keep `use_ai_advice` enabled in `/api/predict`.
+
+## OpenRouter setup (optional)
+
+Create `.env` file:
 
 ```env
 OPENROUTER_API_KEY=your_openrouter_api_key_here
+OPENROUTER_VISION_BACKUP_MODEL=openai/gpt-4o-mini
 ```
 
-## Dataset preparation
+If no valid key is present, local remedy logic still works and AI responses degrade gracefully.
 
-Option A: Use downloader script:
-
-```powershell
-python download_dataset.py
-```
-
-Option B: Manually place dataset folders here:
-
-- `dataset/train/<class_name>/*.jpg`
-- `dataset/valid/<class_name>/*.jpg`
-
-## Train model
+## Train / update model
 
 ```powershell
 python src/train.py
 ```
 
 Outputs:
+
 - `models/plant_disease_model.h5`
 - `models/class_names.json`
 
-## Run prediction from CLI
+## Vercel deployment
 
-```powershell
-python src/predict.py --image path_to_leaf.jpg
-```
+### 1) Push project to GitHub
 
-With AI advice:
+### 2) Import repository in Vercel
 
-```powershell
-python src/predict.py --image path_to_leaf.jpg --ai-advice
-```
+Vercel uses:
 
-## Run Streamlit app
+- `buildCommand`: `npm run build`
+- `outputDirectory`: `frontend/dist`
+- Python API functions from `api/*.py`
 
-```powershell
-streamlit run app.py
-```
+### 3) Set environment variables in Vercel
 
-Upload a leaf image and the app will show:
-- Predicted disease class
-- Confidence
-- Local remedy steps
-- Prevention recommendations
-- Optional AI guidance
+- `OPENROUTER_API_KEY` (optional)
+- `OPENROUTER_VISION_BACKUP_MODEL` (optional)
 
-## Notes
+### 4) Deploy
 
-- If you see `Model not found`, run training first.
-- If AI advice fails, local remedy guidance still works.
-- For real farm usage, verify final treatment with local agricultural extension experts.
+Frontend serves from static build, and API endpoints are available as:
+
+- `/api/predict`
+- `/api/ai_advice`
+- `/api/health`
+
+## Important deployment note
+
+`models/plant_disease_model.h5` is large (~533 MB) and cannot fit in Vercel serverless limits.
+
+- Vercel deployment should be used for frontend + lightweight API routes (like `/api/ai_advice`).
+- Run full TensorFlow model inference (`/api/predict`) on a dedicated backend service and connect it from the frontend.
